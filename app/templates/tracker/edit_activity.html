@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        {% include "messages.html" %}
+        <div class="columns">
+            <div class="column is-one-third is-offset-4 box">
+                <h1 class="title has-text-centered">Activity</h1>
+                <form method="post">
+                    {{form.hidden_tag()}}
+                    <div class="field">
+                        <label class="label">{{form.title.label}}</label>
+                        <div class="control">
+                            {{form.title(class="input is-danger")}}
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">{{form.description.label}}</label>
+                        <div class="control">
+                            {{form.description(class="textarea")}}
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">{{form.priority.label}}</label>
+                        <div class="select">
+                            {{form.priority()}}
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">{{form.start_at.label}}</label>
+                        <div class="control">
+                            {{form.start_at(class="input is-danger")}}
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">{{form.end_at.label}}</label>
+                        <div class="control">
+                            {{form.end_at(class="input is-danger")}}
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="control">
+                            <a href="{{url_for('tracker.index')}}" class="button is-white" type="submit">
+                                Cancel
+                            </a>
+                            <button class="button is-success" type="submit">
+                                Submit
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block scripts %}
+{{super()}}
+<script>
+    $(function () {
+        $('input[name="start_at"]').daterangepicker({
+            singleDatePicker: true,
+            timePicker: true,
+            timePicker24Hour: false,
+            locale: {
+                format: 'DD/MM/YYYY HH:mm'
+            }
+        })
+        $('input[name="end_at"]').daterangepicker({
+            singleDatePicker: true,
+            timePicker24Hour: false,
+            timePicker: true,
+            locale: {
+                format: 'DD/MM/YYYY HH:mm'
+            }
+        })
+    })
+</script>
+{% endblock %}

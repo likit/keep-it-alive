@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        {% include "messages.html" %}
+        <div class="columns">
+            <div class="column is-two-thirds is-offset-2">
+                <h1 class="title has-text-centered">Tasks</h1>
+                {% for t in activity.tasks %}
+                <article hx-get="{{url_for('tracker.edit_task', task_id=t.id, activity_id=activity.id)}}"
+                         hx-target="#form-location"
+                         hx-swap="innerHTML"
+                         class="media box mb-4">
+                    <div class="media-content">
+                        <div class="content">
+                            {{t.task}}
+                            <progress class="progress is-success" value="{{t.progress}}" max="100"></progress>
+                        </div>
+                    </div>
+                    <div class="media-right">
+                        <button class="delete"></button>
+                    </div>
+                </article>
+                {% endfor %}
+                <div id="form-location"></div>
+                <div class="buttons is-centered">
+                    <button class="button is-success"
+                            hx-swap="innerHTML"
+                            hx-target="#form-location"
+                            hx-get="{{url_for('tracker.edit_task', activity_id=activity.id)}}">
+                        New Task
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

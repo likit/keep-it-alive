@@ -1,5 +1,6 @@
 import os
 
+import arrow
 from dotenv import load_dotenv
 from flask import Flask, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
@@ -31,6 +32,8 @@ from app.tracker import tracker_bp as tracker_blueprint
 
 app.register_blueprint(tracker_blueprint)
 
+from app.tracker.models import *
+
 from app.auth import auth_bp as auth_blueprint
 
 app.register_blueprint(auth_blueprint)
@@ -46,3 +49,11 @@ def index():
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+
+@app.template_filter("humanizedt")
+def humanize_datetime(dt):
+    if dt:
+        return arrow.get(dt, 'Asia/Bangkok').humanize()
+    else:
+        return None

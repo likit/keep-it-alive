@@ -1,0 +1,52 @@
+<div class="modal is-active" id="task-form-modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">Task Form</p>
+            <button type="button" id="cancelButton" class="delete" aria-label="close"></button>
+        </header>
+      <form hx-post="{{url_for('tracker.edit_task', task_id=task_id, activity_id=activity.id)}}"
+            hx-swap="none" hx-indicator="#submit-btn">
+        <section class="modal-card-body">
+            {{ form.hidden_tag() }}
+            <div class="field">
+              <label class="label">{{form.task.label}}</label>
+              <div class="control">
+                {{form.task(class="input is-danger")}}
+              </div>
+            </div>
+            <div class="field">
+                <label class="label">{{form.progress.label}}</label>
+                <div class="select">
+                    {{form.progress()}}
+                </div>
+            </div>
+            <div class="field">
+              <label class="label">{{form.note.label}}</label>
+              <div class="control">
+                {{form.note(class="textarea")}}
+              </div>
+            </div>
+        </section>
+        <footer class="modal-card-foot">
+          <a id="cancel-btn" class="button is-white" type="submit">
+            Cancel
+          </a>
+          <button class="button is-success" id="submit-btn" type="submit">
+            Submit
+          </button>
+        </footer>
+      </form>
+    </div>
+</div>
+<script>
+    window.document.getElementById("cancelButton").addEventListener("click", function () {
+        htmx.removeClass(htmx.find('#task-form-modal'), 'is-active')
+    })
+    window.document.getElementById("cancel-btn").addEventListener("click", function (e) {
+        htmx.removeClass(htmx.find('#task-form-modal'), 'is-active')
+    })
+    window.addEventListener('closeModal', () => {
+        htmx.removeClass(htmx.find('#task-form-modal'), 'is-active')
+    })
+</script>

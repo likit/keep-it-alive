@@ -1,9 +1,89 @@
-from flask_login import login_required
+from datetime import datetime
 
+from dateutil.tz import tz
+from flask import render_template, flash, redirect, url_for, make_response
+from flask_login import login_required, current_user
+from sqlalchemy import func
+
+from app import db
 from app.tracker import tracker_bp as tracker
+from app.tracker.forms import ActivityForm, TaskForm
+from app.tracker.models import TrackerActivity, TrackerTask
 
 
 @tracker.get('/')
 @login_required
 def index():
-    return 'Welcome to your Activity Tracker!'
+    activities = TrackerActivity.query.filter_by(creator=current_user) \
+        .filter(func.timezone('Asia/Bangkok', TrackerActivity.end_at) > datetime.now(tz=tz.gettz('Asia/Bangkok')))
+    return render_template('tracker/index.html', activities=activities)
+
+
+@tracker.route('/activities', methods=['GET', 'POST'])
+@tracker.route('/activities/<int:activity_id>/edit', methods=['POST'])
+@login_required
+def edit_activity(activity_id=None):
+    form = ActivityForm()
+    if form.validate_on_submit():
+        if not activity_id:
+            activity = TrackerActivity()
+            form.populate_obj(activity)
+            activity.start_at.replace(tzinfo=tz.gettz('Asia/Bangkok'))
+            activity.end_at.replace(tzinfo=tz.gettz('Asia/Bangkok'))
+            activity.created_at = datetime.now(tz=tz.gettz('Asia/Bangkok'))
+            activity.creator = current_user
+            db.session.add(activity)
+            db.session.commit()
+    else:
+        for e in form.errors:
+            flash(f'{e}: {form.errors[e]}', 'danger')
+    return render_template('tracker/edit_activity.html', form=form)
+
+
+@tracker.route('/activities/<int:activity_id>/tasks')
+@login_required
+def show_tasks(activity_id):
+    activity = TrackerActivity.query.get(activity_id)
+    form = TaskForm()
+    if form.validate_on_submit():
+        task = TrackerTask()
+        form.populate_obj(task)
+        task.created_at = datetime.now(tz=tz.gettz('Asia/Bangkok'))
+        task.activity = activity
+        db.session.add(task)
+        db.session.commit()
+        flash('Task added successfully!', 'success')
+        return redirect(url_for('tracker.edit_task', task_id=task_id, activity_id=activity_id))
+    return render_template('tracker/tasks.html', form=form, activity=activity)
+
+
+@tracker.route('/activities/<int:activity_id>/tasks/new', methods=['GET', 'POST'])
+@tracker.route('/activities/<int:activity_id>/tasks/<int:task_id>', methods=['GET', 'POST'])
+@login_required
+def edit_task(activity_id, task_id=None):
+    activity = TrackerActivity.query.get(activity_id)
+    if task_id:
+        task = TrackerTask.query.get(task_id)
+        form = TaskForm(obj=task)
+    else:
+        form = TaskForm()
+    if form.validate_on_submit():
+        if not task_id:
+            task = TrackerTask()
+        form.populate_obj(task)
+
+        if not task_id:
+            task.created_at = datetime.now(tz=tz.gettz('Asia/Bangkok'))
+            task.activity = activity
+        if task.progress == 100:
+            task.finished_at = datetime.now(tz=tz.gettz('Asia/Bangkok'))
+        else:
+            task.finished_at = None
+        db.session.add(task)
+        db.session.commit()
+        flash('Task added successfully!', 'success')
+        resp = make_response()
+        resp.headers['HX-Redirect'] = url_for('tracker.show_tasks', task_id=task_id, activity_id=activity_id)
+        return resp
+    return render_template('tracker/modals/task_form.html',
+                           form=form, task_id=task_id, activity=activity)
