@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{% endblock %}</title>
+    {% block head %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/1.0.0/css/bulma.min.css" integrity="sha512-+oEiKVGJRHutsibRYkkTIfjI0kspDtgJtkIlyPCNTCFCdhy+nSe25nvrCw7UpHPwNbdmNw9AkgGA+ptQxcjPug==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    {% endblock %}
+</head>
+<body>
+{% block content %}
+{% endblock %}
+{% block footer %}
+<footer>
+    <div class="content has-text-centered">
+        {% if config['DEBUG'] %}
+            <article class="message is-warning">
+                <div class="message-header">
+                    DEBUG MODE
+                </div>
+                <div class="message-body">
+                    <strong>Template file:</strong> {{ self._TemplateReference__context.name }}
+                </div>
+            </article>
+        {% endif %}
+    </div>
+</footer>
+{% endblock %}
+</body>
+</html>

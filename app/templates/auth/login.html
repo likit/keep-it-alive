@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        {% include "messages.html" %}
+        <div class="columns">
+            <div class="column is-one-third is-offset-4 box">
+                <h1 class="title has-text-centered">Log In Form</h1>
+                <form method="post">
+                    {{form.hidden_tag()}}
+                    <div class="field">
+                        <label class="label">{{form.email.label}}</label>
+                        <div class="control">
+                            {{form.email(class="input is-danger")}}
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">{{form.password.label}}</label>
+                        <div class="control">
+                            {{form.password(class="input is-danger")}}
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="control">
+                            <button class="button is-success" type="submit">
+                                Log In
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
