@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from dateutil.tz import tz
-from flask import render_template, flash, redirect, url_for, make_response
+from flask import render_template, flash, redirect, url_for, make_response, request
 from flask_login import login_required, current_user
 from sqlalchemy import func
 
@@ -14,16 +14,25 @@ from app.tracker.models import TrackerActivity, TrackerTask
 @tracker.get('/')
 @login_required
 def index():
+    filter = request.args.get('filter', 'unfinished')
     activities = TrackerActivity.query.filter_by(creator=current_user) \
         .filter(func.timezone('Asia/Bangkok', TrackerActivity.end_at) > datetime.now(tz=tz.gettz('Asia/Bangkok')))
+    if filter == 'unfinished':
+        activities = activities.filter_by(finished_at=None)
     return render_template('tracker/index.html', activities=activities)
 
 
 @tracker.route('/activities', methods=['GET', 'POST'])
-@tracker.route('/activities/<int:activity_id>/edit', methods=['POST'])
+@tracker.route('/activities/<int:activity_id>/edit', methods=['POST', 'PATCH'])
 @login_required
 def edit_activity(activity_id=None):
     form = ActivityForm()
+    if request.method == 'PATCH':
+        activity = TrackerActivity.query.get(activity_id)
+        activity.finished_at = datetime.now(tz=tz.gettz('Asia/Bangkok'))
+        db.session.add(activity)
+        db.session.commit()
+        return make_response()
     if form.validate_on_submit():
         if not activity_id:
             activity = TrackerActivity()

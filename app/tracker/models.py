@@ -20,6 +20,7 @@ class TrackerActivity(db.Model):
     created_at = db.Column(db.DateTime(timezone=True))
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     creator = db.relationship(User, backref=db.backref('activities', lazy='dynamic'))
+    finished_at = db.Column(db.DateTime(timezone=True))
 
     @property
     def remaining_days(self):
@@ -32,9 +33,9 @@ class TrackerActivity(db.Model):
         return delta.days
 
     @property
-    def percent_finished_tasks(self):
+    def unfinished_tasks(self):
         if self.tasks.count():
-            return len(self.tasks.filter_by(finished_at=None).all()) / self.tasks.count()
+            return self.tasks.filter_by(finished_at=None).count()
         else:
             return self.tasks.count()
 

@@ -1,5 +1,15 @@
 {% extends "base.html" %}
 
+{% block head %}
+{{super()}}
+<style>
+    tr.htmx-swapping td {
+        opacity: 0;
+        transition: opacity 1s ease-out;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <section class="section">
     <div class="container">
@@ -19,8 +29,8 @@
                     <th>Description</th>
                     <th>Start</th>
                     <th>End</th>
+                    <th>Finished Tasks</th>
                     <th>Finished</th>
-                    <th>Remaining Days</th>
                     </thead>
                     <tbody>
                     {% for a in activities %}
@@ -28,18 +38,36 @@
                         <td><a href="{{url_for('tracker.show_tasks', activity_id=a.id)}}">{{a.title}}</a></td>
                         <td>{{a.description}}</td>
                         <td>{{a.start_at|humanizedt}}</td>
-                        <td>{{a.end_at|humanizedt}}</td>
-                        <td>{{a.percent_finished_tasks}}%</td>
                         <td>
-                            <progress class="progress is-warning"
+                            {{a.end_at|humanizedt}}
+                            <progress class="progress is-warning is-small"
                                       value="{{a.remaining_days}}"
-                                      max="{{a.total_days}}"
+                                      max="30"
                             >
                             </progress>
                         </td>
+                        <td>
+                            {{a.unfinished_tasks}}
+                            <progress class="progress is-success is-small"
+                                      value="{{a.tasks.count() - a.unfinished_tasks}}"
+                                      max="{{a.tasks.count()}}"
+                            >
+                            </progress>
+                        </td>
+                        <td>
+                            <a hx-confirm="Are you sure?" class="button is-small"
+                               hx-target="closest tr"
+                               hx-swap="outerHTML swap:1s"
+                               hx-patch="{{url_for('tracker.edit_activity', activity_id=a.id, _method='PATCH')}}"
+                            >
+                                <span class="icon">
+                                    <i class="fa-solid fa-circle-check"></i>
+                                </span>
+                                <span>done</span>
+                            </a>
+                        </td>
                     </tr>
                     {% endfor %}
-                    <tr></tr>
                     </tbody>
                 </table>
                 <a href="{{url_for('tracker.edit_activity')}}"
