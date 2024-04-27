@@ -47,8 +47,9 @@ class TrackerActivity(db.Model):
         last_update = None
         if unfinished_tasks.count():
             for task in unfinished_tasks:
-                if task.updated_at and task.updated_at > last_update:
-                    last_update = task.updated_at
+                if task.updated_at:
+                    if last_update and task.updated_at > last_update:
+                        last_update = task.updated_at
         return last_update
 
     def update_life_span_days(self):
