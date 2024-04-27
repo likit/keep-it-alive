@@ -55,9 +55,10 @@ def load_user(user_id):
 @app.template_filter("humanizedt")
 def humanize_datetime(dt):
     if dt:
-        return arrow.get(dt, 'Asia/Bangkok').humanize()
+        return arrow.get(dt.astimezone(tz.gettz('Asia/Bangkok'))).humanize()
     else:
         return None
+
 
 @app.template_filter("localdatetime")
 def local_datetime(dt):
