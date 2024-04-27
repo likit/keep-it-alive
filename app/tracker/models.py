@@ -52,13 +52,12 @@ class TrackerActivity(db.Model):
         return last_update
 
     def update_life_span_days(self):
-        last_update = self.last_active
-        if last_update:
-            delta = datetime.now(tz=tz.gettz('Asia/Bangkok')) - last_update
-            if delta.days <= self.life_span_days:
-                self.life_span_days = self.life_span_days - delta.days
-            else:
-                self.life_span_days = 0
+        last_update = self.last_active or self.start_at
+        delta = datetime.now(tz=tz.gettz('Asia/Bangkok')) - last_update
+        if delta.days <= self.life_span_days:
+            self.life_span_days = self.life_span_days - delta.days
+        else:
+            self.life_span_days = 0
 
 
 class TrackerTask(db.Model):
