@@ -47,7 +47,14 @@
                             {% endif %}
                         </td>
                         <td>{{a.description}}</td>
-                        <td>{{a.start_at|humanizedt}}</td>
+                        <td>
+                            <p>
+                                {{a.start_at|humanizedt}}
+                            </p>
+                            <p>
+                                {{a.start_at|localdatetime}}
+                            </p>
+                        </td>
                         <td>
                             {{a.end_at|humanizedt}}
                             <progress class="progress is-warning is-small"
@@ -55,6 +62,7 @@
                                       max="30"
                             >
                             </progress>
+                            {{a.end_at|localdatetime}}
                         </td>
                         <td>
                             {{a.tasks.count() - a.unfinished_tasks}}/{{a.tasks.count()}}
@@ -65,7 +73,10 @@
                             </progress>
                         </td>
                         <td>
-                            {{a.last_active|humanizedt or ''}}
+                            <p>
+                                {{a.last_active|humanizedt or ''}}
+                            </p>
+                            {{a.last_active|localdatetime or ''}}
                         </td>
                         <td>
                             {{a.life_span_days}} days

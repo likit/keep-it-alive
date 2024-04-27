@@ -58,3 +58,12 @@ def humanize_datetime(dt):
         return arrow.get(dt, 'Asia/Bangkok').humanize()
     else:
         return None
+
+@app.template_filter("localdatetime")
+def local_datetime(dt):
+    datetime_format = '%d/%m/%Y %X'
+    if dt:
+        if dt.tzinfo:
+            return dt.astimezone(tz.gettz('Asia/Bangkok')).strftime(datetime_format)
+    else:
+        return None
