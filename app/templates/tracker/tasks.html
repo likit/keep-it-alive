@@ -25,11 +25,14 @@
                 {% endfor %}
                 <div id="form-location"></div>
                 <div class="buttons is-centered">
-                    <button class="button is-success"
+                    <button class="button is-success is-outlined"
                             hx-swap="innerHTML"
                             hx-target="#form-location"
                             hx-get="{{url_for('tracker.edit_task', activity_id=activity.id)}}">
-                        New Task
+                        <span class="icon">
+                            <i class="fa-solid fa-plus"></i>
+                        </span>
+                        <span>New Task</span>
                     </button>
                 </div>
             </div>

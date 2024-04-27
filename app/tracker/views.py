@@ -36,13 +36,17 @@ def edit_activity(activity_id=None):
     if form.validate_on_submit():
         if not activity_id:
             activity = TrackerActivity()
-            form.populate_obj(activity)
-            activity.start_at.replace(tzinfo=tz.gettz('Asia/Bangkok'))
-            activity.end_at.replace(tzinfo=tz.gettz('Asia/Bangkok'))
-            activity.created_at = datetime.now(tz=tz.gettz('Asia/Bangkok'))
-            activity.creator = current_user
-            db.session.add(activity)
-            db.session.commit()
+            flash('New activity was added.', 'success')
+        else:
+            flash('The activity has been updated.', 'success')
+        form.populate_obj(activity)
+        activity.start_at.replace(tzinfo=tz.gettz('Asia/Bangkok'))
+        activity.end_at.replace(tzinfo=tz.gettz('Asia/Bangkok'))
+        activity.created_at = datetime.now(tz=tz.gettz('Asia/Bangkok'))
+        activity.creator = current_user
+        db.session.add(activity)
+        db.session.commit()
+        return redirect(url_for('tracker.edit_activity'))
     else:
         for e in form.errors:
             flash(f'{e}: {form.errors[e]}', 'danger')

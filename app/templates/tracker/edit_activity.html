@@ -4,9 +4,9 @@
 <section class="section">
     <div class="container">
         {% include "messages.html" %}
+        <h1 class="title has-text-centered">Activity</h1>
         <div class="columns">
             <div class="column is-one-third is-offset-4 box">
-                <h1 class="title has-text-centered">Activity</h1>
                 <form method="post">
                     {{form.hidden_tag()}}
                     <div class="field">
@@ -18,7 +18,7 @@
                     <div class="field">
                         <label class="label">{{form.description.label}}</label>
                         <div class="control">
-                            {{form.description(class="textarea")}}
+                            {{form.description(class="textarea is-danger")}}
                         </div>
                     </div>
                     <div class="field">
@@ -45,11 +45,28 @@
                                 Cancel
                             </a>
                             <button class="button is-success" type="submit">
-                                Submit
+                                <span class="icon">
+                                    <i class="fa-solid fa-floppy-disk"></i>
+                                </span>
+                                <span>Submit</span>
                             </button>
                         </div>
                     </div>
                 </form>
+            </div>
+        </div>
+        <div class="columns">
+            <div class="column">
+                <div class="buttons is-centered">
+                    <a class="button is-light" href="{{url_for('tracker.index')}}">
+                        <span class="icon">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </span>
+                        <span>
+                            Back
+                        </span>
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -58,21 +75,40 @@
 {% block scripts %}
 {{super()}}
 <script>
+    let DATETIME_FORMAT = 'DD/MM/YYYY HH:mm'
     $(function () {
         $('input[name="start_at"]').daterangepicker({
+            startDate: moment().startOf('hour'),
             singleDatePicker: true,
             timePicker: true,
             timePicker24Hour: false,
             locale: {
-                format: 'DD/MM/YYYY HH:mm'
+                format: DATETIME_FORMAT
             }
         })
         $('input[name="end_at"]').daterangepicker({
+            startDate: moment().startOf('hour').add(1, 'day'),
             singleDatePicker: true,
             timePicker24Hour: false,
             timePicker: true,
             locale: {
-                format: 'DD/MM/YYYY HH:mm'
+                format: DATETIME_FORMAT
+            }
+        })
+        $('input[name="start_at"]').on('apply.daterangepicker', function () {
+            let endDateTime = moment($('input[name="end_at"]').val(), DATETIME_FORMAT)
+            let startDateTime = moment($('input[name="start_at"]').val(), DATETIME_FORMAT)
+            if (startDateTime.format() == endDateTime.format()) {
+                alert('Start and end of the activity should not be the same.')
+            }
+        })
+        $('input[name="end_at"]').on('apply.daterangepicker', function () {
+            let endDateTime = moment($('input[name="end_at"]').val(), DATETIME_FORMAT)
+            let startDateTime = moment($('input[name="start_at"]').val(), DATETIME_FORMAT)
+            if (startDateTime.format() == endDateTime.format()) {
+                alert('Start and end of the activity should not be the same.')
+                $('input[name="end_at"]').data('daterangepicker')
+                    .setStartDate(startDateTime.add(1, 'hours'))
             }
         })
     })
