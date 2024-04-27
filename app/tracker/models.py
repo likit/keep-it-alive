@@ -44,10 +44,12 @@ class TrackerActivity(db.Model):
     @property
     def last_active(self):
         unfinished_tasks = self.tasks.filter_by(finished_at=None)
+        last_update = None
         if unfinished_tasks.count():
-            return max([t.updated_at for t in unfinished_tasks])
-        else:
-            return None
+            for task in unfinished_tasks:
+                if task.updated_at and task.updated_at > last_update:
+                    last_update = task.updated_at
+        return last_update
 
     def update_life_span_days(self):
         last_update = self.last_active
