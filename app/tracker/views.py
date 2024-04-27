@@ -62,7 +62,7 @@ def show_tasks(activity_id):
         db.session.add(task)
         db.session.commit()
         flash('Task added successfully!', 'success')
-        return redirect(url_for('tracker.edit_task', task_id=task_id, activity_id=activity_id))
+        return redirect(url_for('tracker.edit_task', task_id=task.id, activity_id=activity_id))
     return render_template('tracker/tasks.html', form=form, activity=activity)
 
 
@@ -86,8 +86,8 @@ def edit_task(activity_id, task_id=None):
             task.activity = activity
         if task.progress == 100:
             task.finished_at = datetime.now(tz=tz.gettz('Asia/Bangkok'))
-        else:
-            task.finished_at = None
+        task.updated_at = datetime.now(tz=tz.gettz('Asia/Bangkok'))
+        task.activity.life_span_days += 3
         db.session.add(task)
         db.session.commit()
         flash('Task added successfully!', 'success')

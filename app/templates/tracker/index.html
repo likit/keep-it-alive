@@ -30,12 +30,22 @@
                     <th>Start</th>
                     <th>End</th>
                     <th>Finished Tasks</th>
+                    <th>Last Active</th>
+                    <th>Life Span</th>
                     <th>Finished</th>
                     </thead>
                     <tbody>
                     {% for a in activities %}
                     <tr>
-                        <td><a href="{{url_for('tracker.show_tasks', activity_id=a.id)}}">{{a.title}}</a></td>
+                        <td>
+                            {% if a.life_span_days > 0 %}
+                            <a href="{{url_for('tracker.show_tasks', activity_id=a.id)}}">{{a.title}}</a>
+                            {% else %}
+                            <span class="has-text-light">
+                                {{a.title}}
+                            </span>
+                            {% endif %}
+                        </td>
                         <td>{{a.description}}</td>
                         <td>{{a.start_at|humanizedt}}</td>
                         <td>
@@ -47,10 +57,21 @@
                             </progress>
                         </td>
                         <td>
-                            {{a.unfinished_tasks}}
+                            {{a.tasks.count() - a.unfinished_tasks}}/{{a.tasks.count()}}
                             <progress class="progress is-success is-small"
                                       value="{{a.tasks.count() - a.unfinished_tasks}}"
                                       max="{{a.tasks.count()}}"
+                            >
+                            </progress>
+                        </td>
+                        <td>
+                            {{a.last_active|humanizedt or ''}}
+                        </td>
+                        <td>
+                            {{a.life_span_days}} days
+                            <progress class="progress {% if a.life_span_days > 14 %} is-success {% else %} is-danger {% endif %} is-small"
+                                      value="{{a.life_span_days}}"
+                                      max="30"
                             >
                             </progress>
                         </td>

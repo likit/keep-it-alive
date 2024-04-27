@@ -21,6 +21,7 @@ class TrackerActivity(db.Model):
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     creator = db.relationship(User, backref=db.backref('activities', lazy='dynamic'))
     finished_at = db.Column(db.DateTime(timezone=True))
+    life_span_days = db.Column(db.Integer, default=3)
 
     @property
     def remaining_days(self):
@@ -39,6 +40,14 @@ class TrackerActivity(db.Model):
         else:
             return self.tasks.count()
 
+    @property
+    def last_active(self):
+        unfinished_tasks = self.tasks.filter_by(finished_at=None)
+        if unfinished_tasks.count():
+            return max([t.updated for t in unfinished_tasks])
+        else:
+            return None
+
 
 class TrackerTask(db.Model):
     __tablename__ = 'tracker_tasks'
@@ -47,6 +56,7 @@ class TrackerTask(db.Model):
     note = db.Column(db.Text())
     created_at = db.Column(db.DateTime(timezone=True))
     finished_at = db.Column(db.DateTime(timezone=True))
+    updated_at = db.Column(db.DateTime(timezone=True))
     activity_id = db.Column(db.Integer, db.ForeignKey('tracker_activities.id'))
     activity = db.relationship(TrackerActivity,
                                backref=db.backref('tasks',
