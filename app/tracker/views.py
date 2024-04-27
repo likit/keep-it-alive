@@ -19,6 +19,11 @@ def index():
         .filter(func.timezone('Asia/Bangkok', TrackerActivity.end_at) > datetime.now(tz=tz.gettz('Asia/Bangkok')))
     if filter == 'unfinished':
         activities = activities.filter_by(finished_at=None)
+
+    for activity in activities:
+        activity.update_life_span_days()
+        db.session.add(activity)
+    db.session.commit()
     return render_template('tracker/index.html', activities=activities)
 
 

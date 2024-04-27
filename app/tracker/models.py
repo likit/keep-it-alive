@@ -45,9 +45,18 @@ class TrackerActivity(db.Model):
     def last_active(self):
         unfinished_tasks = self.tasks.filter_by(finished_at=None)
         if unfinished_tasks.count():
-            return max([t.updated for t in unfinished_tasks])
+            return max([t.updated_at for t in unfinished_tasks])
         else:
             return None
+
+    def update_life_span_days(self):
+        last_update = self.last_active
+        if last_update:
+            delta = datetime.now(tz=tz.gettz('Asia/Bangkok')) - last_update
+            if delta.days <= self.life_span_days:
+                self.life_span_days = self.life_span_days - delta.days
+            else:
+                self.life_span_days = 0
 
 
 class TrackerTask(db.Model):
