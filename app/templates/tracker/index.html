@@ -20,6 +20,7 @@
                 <div class="tabs is-boxed">
                     <ul>
                         <li class="is-active"><a>Upcoming</a></li>
+                        <li><a>Graveyard</a></li>
                         <li><a>All</a></li>
                     </ul>
                 </div>
@@ -38,11 +39,10 @@
                     {% for a in activities %}
                     <tr>
                         <td>
-                            {% if a.life_span_days > 0 %}
                             <a href="{{url_for('tracker.show_tasks', activity_id=a.id)}}">{{a.title}}</a>
-                            {% else %}
-                            <span class="has-text-light">
-                                {{a.title}}
+                            {% if a.life_span_days == 0 %}
+                            <span class="icon">
+                                <i class="fa-solid fa-skull-crossbones has-text-danger"></i>
                             </span>
                             {% endif %}
                         </td>
