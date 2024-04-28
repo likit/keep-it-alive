@@ -24,7 +24,8 @@ def index():
         activity.update_life_span_days()
         db.session.add(activity)
     db.session.commit()
-    return render_template('tracker/index.html', activities=activities)
+    return render_template('tracker/index.html',
+                           activities=activities.order_by(TrackerActivity.end_at))
 
 
 @tracker.route('/activities', methods=['GET', 'POST'])
@@ -93,10 +94,11 @@ def edit_task(activity_id, task_id=None):
         if not task_id:
             task.created_at = datetime.now(tz=tz.gettz('Asia/Bangkok'))
             task.activity = activity
+        else:
+            task.activity.life_span_days += 3
         if task.progress == 100:
             task.finished_at = datetime.now(tz=tz.gettz('Asia/Bangkok'))
         task.updated_at = datetime.now(tz=tz.gettz('Asia/Bangkok'))
-        task.activity.life_span_days += 3
         db.session.add(task)
         db.session.commit()
         flash('Task added successfully!', 'success')

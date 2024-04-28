@@ -7,8 +7,19 @@
         <div class="columns">
             <div class="column is-two-thirds is-offset-2">
                 <h1 class="title has-text-centered">Tasks</h1>
+                <div class="buttons is-centered">
+                    <button class="button is-success is-outlined"
+                            hx-swap="innerHTML"
+                            hx-target="#form-location"
+                            hx-get="{{url_for('tracker.edit_task', activity_id=activity.id)}}">
+                        <span class="icon">
+                            <i class="fa-solid fa-plus"></i>
+                        </span>
+                        <span>New Task</span>
+                    </button>
+                </div>
                 {% for t in activity.tasks %}
-                <article hx-get="{{url_for('tracker.edit_task', task_id=t.id, activity_id=activity.id)}}"
+                <a hx-get="{{url_for('tracker.edit_task', task_id=t.id, activity_id=activity.id)}}"
                          hx-target="#form-location"
                          hx-swap="innerHTML"
                          class="media box mb-4">
@@ -21,19 +32,22 @@
                     <div class="media-right">
                         <button class="delete"></button>
                     </div>
-                </article>
+                </a>
                 {% endfor %}
                 <div id="form-location"></div>
+            </div>
+        </div>
+        <div class="columns">
+            <div class="column">
                 <div class="buttons is-centered">
-                    <button class="button is-success is-outlined"
-                            hx-swap="innerHTML"
-                            hx-target="#form-location"
-                            hx-get="{{url_for('tracker.edit_task', activity_id=activity.id)}}">
+                    <a class="button is-light" href="{{url_for('tracker.index')}}">
                         <span class="icon">
-                            <i class="fa-solid fa-plus"></i>
+                            <i class="fa-solid fa-chevron-left"></i>
                         </span>
-                        <span>New Task</span>
-                    </button>
+                        <span>
+                            Back
+                        </span>
+                    </a>
                 </div>
             </div>
         </div>

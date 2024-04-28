@@ -17,6 +17,14 @@
         <div class="columns">
             <div class="column">
                 <h1 class="title has-text-centered">Activity Tracker</h1>
+                <div class="buttons is-centered">
+                    <a href="{{url_for('tracker.edit_activity')}}" class="button is-link">
+                        <span class="icon">
+                            <i class="fa-solid fa-plus"></i>
+                        </span>
+                        <span>New Activity</span>
+                    </a>
+                </div>
                 <div class="tabs is-boxed">
                     <ul>
                         <li class="is-active"><a>Upcoming</a></li>
@@ -33,18 +41,22 @@
                     <th>Finished Tasks</th>
                     <th>Last Active</th>
                     <th>Life Span</th>
-                    <th>Finished</th>
+                    <th></th>
                     </thead>
                     <tbody>
                     {% for a in activities %}
                     <tr>
                         <td>
-                            <a href="{{url_for('tracker.show_tasks', activity_id=a.id)}}">{{a.title}}</a>
+                            <a href="{{url_for('tracker.show_tasks', activity_id=a.id)}}">
                             {% if a.life_span_days == 0 %}
+                            <strong class="has-text-danger">{{a.title}}</strong>
                             <span class="icon">
                                 <i class="fa-solid fa-skull-crossbones has-text-danger"></i>
                             </span>
+                            {% else %}
+                                {{a.title}}
                             {% endif %}
+                            </a>
                         </td>
                         <td>{{a.description}}</td>
                         <td>
@@ -56,8 +68,14 @@
                             </p>
                         </td>
                         <td>
+                            {% if a.remaining_days > 3 %}
                             {{a.end_at|humanizedt}}
-                            <progress class="progress is-warning is-small"
+                            {% else %}
+                            <strong class="has-text-danger">
+                                {{a.end_at|humanizedt}}
+                            </strong>
+                            {% endif %}
+                            <progress class="progress {% if a.remaining_days > 3 %} is-warning {% else %} is-danger {% endif %} is-small"
                                       value="{{a.remaining_days}}"
                                       max="30"
                             >
@@ -95,20 +113,13 @@
                                 <span class="icon">
                                     <i class="fa-solid fa-circle-check"></i>
                                 </span>
-                                <span>done</span>
+                                <span>finish</span>
                             </a>
                         </td>
                     </tr>
                     {% endfor %}
                     </tbody>
                 </table>
-                <a href="{{url_for('tracker.edit_activity')}}"
-                   class="button is-link">
-                    <span class="icon">
-                        <i class="fa-solid fa-plus"></i>
-                    </span>
-                    <span>New Activity</span>
-                </a>
             </div>
         </div>
     </div>
