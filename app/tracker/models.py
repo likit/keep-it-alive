@@ -61,9 +61,9 @@ class TrackerActivity(db.Model):
         end_delta = self.end_at.astimezone(bkktz) - datetime.now(tz=bkktz)
         delta = alive_until - datetime.now(tz=bkktz)
         if delta.days > end_delta.days:
-            return end_delta.days
+            return end_delta.days if end_delta.days > 0 else 0
         else:
-            return delta.days
+            return delta.days if delta.days > 0 else 0
 
 
 class TrackerTask(db.Model):
