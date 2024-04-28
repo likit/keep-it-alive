@@ -48,7 +48,7 @@
                     <tr>
                         <td>
                             <a href="{{url_for('tracker.show_tasks', activity_id=a.id)}}">
-                            {% if a.life_span_days == 0 %}
+                            {% if a.life_in_days == 0 %}
                             <strong class="has-text-danger">{{a.title}}</strong>
                             <span class="icon">
                                 <i class="fa-solid fa-skull-crossbones has-text-danger"></i>
@@ -97,12 +97,13 @@
                             {{a.last_active|localdatetime or ''}}
                         </td>
                         <td>
-                            {{a.life_span_days}} days
-                            <progress class="progress {% if a.life_span_days > 14 %} is-success {% else %} is-danger {% endif %} is-small"
-                                      value="{{a.life_span_days}}"
+                            {{a.life_in_days}} days
+                            <progress class="progress {% if a.life_in_days > 14 %} is-success {% else %} is-danger {% endif %} is-small"
+                                      value="{{a.life_in_days}}"
                                       max="30"
                             >
                             </progress>
+                            {{a.alive_until|localdatetime}}
                         </td>
                         <td>
                             <a hx-confirm="Are you sure?" class="button is-small"

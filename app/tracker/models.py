@@ -22,7 +22,7 @@ class TrackerActivity(db.Model):
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     creator = db.relationship(User, backref=db.backref('activities', lazy='dynamic'))
     finished_at = db.Column(db.DateTime(timezone=True))
-    life_span_days = db.Column(db.Integer, default=3)
+    alive_until = db.Column(db.DateTime(timezone=True))
 
     @property
     def remaining_days(self):
@@ -55,13 +55,15 @@ class TrackerActivity(db.Model):
                             last_update = task.updated_at
         return last_update
 
-    def update_life_span_days(self):
-        last_update = self.last_active or self.start_at
-        delta = datetime.now(tz=tz.gettz('Asia/Bangkok')) - last_update
-        if delta.days <= self.life_span_days:
-            self.life_span_days = self.life_span_days - delta.days
+    @property
+    def life_in_days(self):
+        alive_until = self.alive_until.astimezone(bkktz)
+        end_delta = self.end_at.astimezone(bkktz) - datetime.now(tz=bkktz)
+        delta = alive_until - datetime.now(tz=bkktz)
+        if delta.days > end_delta.days:
+            return end_delta.days
         else:
-            self.life_span_days = 0
+            return delta.days
 
 
 class TrackerTask(db.Model):

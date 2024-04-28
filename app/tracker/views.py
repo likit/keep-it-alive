@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from dateutil.tz import tz
 from flask import render_template, flash, redirect, url_for, make_response, request
@@ -19,11 +19,6 @@ def index():
         .filter(func.timezone('Asia/Bangkok', TrackerActivity.end_at) > datetime.now(tz=tz.gettz('Asia/Bangkok')))
     if filter == 'unfinished':
         activities = activities.filter_by(finished_at=None)
-
-    for activity in activities:
-        activity.update_life_span_days()
-        db.session.add(activity)
-    db.session.commit()
     return render_template('tracker/index.html',
                            activities=activities.order_by(TrackerActivity.end_at))
 
@@ -50,6 +45,8 @@ def edit_activity(activity_id=None):
         activity.end_at.replace(tzinfo=tz.gettz('Asia/Bangkok'))
         activity.created_at = datetime.now(tz=tz.gettz('Asia/Bangkok'))
         activity.creator = current_user
+        if not activity_id:
+            activity.alive_until = activity.start_at + timedelta(days=3)
         db.session.add(activity)
         db.session.commit()
         return redirect(url_for('tracker.edit_activity'))
@@ -95,7 +92,11 @@ def edit_task(activity_id, task_id=None):
             task.created_at = datetime.now(tz=tz.gettz('Asia/Bangkok'))
             task.activity = activity
         else:
-            task.activity.life_span_days += 3
+            # We encourage users to work on a project on a daily basis.
+            # Therefore, updating a bunch of tasks in one day is not rewarded much.
+            if task.activity.last_active.astimezone(tz.gettz('Asia/Bangkok')).date() != \
+                    datetime.now(tz=tz.gettz('Asia/Bangkok')).date():
+                task.activity.alive_until = task.activity.alive_until + timedelta(days=3)
         if task.progress == 100:
             task.finished_at = datetime.now(tz=tz.gettz('Asia/Bangkok'))
         task.updated_at = datetime.now(tz=tz.gettz('Asia/Bangkok'))

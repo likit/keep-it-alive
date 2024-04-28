@@ -7,6 +7,13 @@
         <div class="columns">
             <div class="column is-two-thirds is-offset-2">
                 <h1 class="title has-text-centered">Tasks</h1>
+                <h1 class="subtitle has-text-centered">{{activity.title}}</h1>
+                This activity will die {{activity.alive_until|humanizedt}}.
+                <progress class="progress {% if activity.life_in_days > 14 %} is-success {% else %} is-danger {% endif %}"
+                          value="{{activity.life_in_days}}"
+                          max="30"
+                >
+                </progress>
                 <div class="buttons is-centered">
                     <button class="button is-success is-outlined"
                             hx-swap="innerHTML"
