@@ -8,21 +8,39 @@
             <div class="column is-two-thirds is-offset-2">
                 <h1 class="title has-text-centered">Tasks</h1>
                 <h1 class="subtitle has-text-centered">{{activity.title}}</h1>
-                This activity will die {{activity.alive_until|humanizedt}}.
+                <div class="buttons">
+                    <a href="{{url_for('tracker.edit_activity', activity_id=activity.id, next=request.url)}}" class="button is-link">
+                        <span class="icon">
+                            <i class="fa-solid fa-pencil"></i>
+                        </span>
+                        <span>edit</span>
+                    </a>
+                    <a hx-delete="{{url_for('tracker.edit_activity', activity_id=activity.id, next=request.url)}}"
+                       hx-confirm="Do you want to delete this activity?"
+                       hx-swap="none"
+                       hx-indicator="closest a"
+                       class="button is-danger">
+                        <span class="icon">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </span>
+                        <span>delete</span>
+                    </a>
+                </div>
+                This activity started at {{activity.start_at|localdatetime}} and is going to die {{activity.alive_until|humanizedt}}.
                 <progress class="progress {% if activity.life_in_days > 14 %} is-success {% else %} is-danger {% endif %}"
                           value="{{activity.life_in_days}}"
                           max="30"
                 >
                 </progress>
                 <div class="buttons is-centered">
-                    <button class="button is-success is-outlined"
+                    <button class="button is-success"
                             hx-swap="innerHTML"
                             hx-target="#form-location"
                             hx-get="{{url_for('tracker.edit_task', activity_id=activity.id)}}">
                         <span class="icon">
                             <i class="fa-solid fa-plus"></i>
                         </span>
-                        <span>New Task</span>
+                        <span>add task</span>
                     </button>
                 </div>
                 {% for t in activity.tasks %}

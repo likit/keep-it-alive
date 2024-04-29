@@ -81,7 +81,7 @@
             startDate: moment().startOf('hour'),
             singleDatePicker: true,
             timePicker: true,
-            timePicker24Hour: false,
+            timePicker24Hour: true,
             locale: {
                 format: DATETIME_FORMAT
             }
@@ -89,7 +89,7 @@
         $('input[name="end_at"]').daterangepicker({
             startDate: moment().startOf('hour').add(1, 'day'),
             singleDatePicker: true,
-            timePicker24Hour: false,
+            timePicker24Hour: true,
             timePicker: true,
             locale: {
                 format: DATETIME_FORMAT

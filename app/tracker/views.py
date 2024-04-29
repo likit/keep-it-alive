@@ -24,12 +24,22 @@ def index():
 
 
 @tracker.route('/activities', methods=['GET', 'POST'])
-@tracker.route('/activities/<int:activity_id>/edit', methods=['POST', 'PATCH'])
+@tracker.route('/activities/<int:activity_id>/edit', methods=['GET', 'POST', 'PATCH', 'DELETE'])
 @login_required
 def edit_activity(activity_id=None):
-    form = ActivityForm()
-    if request.method == 'PATCH':
+    if activity_id is None:
+        form = ActivityForm()
+    else:
         activity = TrackerActivity.query.get(activity_id)
+        form = ActivityForm(obj=activity)
+    if request.method == 'DELETE':
+        db.session.delete(activity)
+        db.session.commit()
+        flash('Activity deleted!', 'success')
+        resp = make_response()
+        resp.headers['HX-Redirect'] = url_for('tracker.index')
+        return resp
+    if request.method == 'PATCH':
         activity.finished_at = datetime.now(tz=tz.gettz('Asia/Bangkok'))
         db.session.add(activity)
         db.session.commit()
@@ -49,7 +59,8 @@ def edit_activity(activity_id=None):
             activity.alive_until = activity.start_at + timedelta(days=3)
         db.session.add(activity)
         db.session.commit()
-        return redirect(url_for('tracker.edit_activity'))
+        next = request.args.get('next')
+        return redirect(next or url_for('tracker.edit_activity'))
     else:
         for e in form.errors:
             flash(f'{e}: {form.errors[e]}', 'danger')
@@ -74,7 +85,7 @@ def show_tasks(activity_id):
 
 
 @tracker.route('/activities/<int:activity_id>/tasks/new', methods=['GET', 'POST'])
-@tracker.route('/activities/<int:activity_id>/tasks/<int:task_id>', methods=['GET', 'POST'])
+@tracker.route('/activities/<int:activity_id>/tasks/<int:task_id>', methods=['GET', 'POST', 'DELETE'])
 @login_required
 def edit_task(activity_id, task_id=None):
     activity = TrackerActivity.query.get(activity_id)
@@ -83,6 +94,13 @@ def edit_task(activity_id, task_id=None):
         form = TaskForm(obj=task)
     else:
         form = TaskForm()
+    if request.method == 'DELETE':
+        task = TrackerTask.query.get(task_id)
+        db.session.delete(task)
+        db.session.commit()
+        resp = make_response()
+        resp.headers['HX-Refresh'] = 'true'
+        return resp
     if form.validate_on_submit():
         if not task_id:
             task = TrackerTask()

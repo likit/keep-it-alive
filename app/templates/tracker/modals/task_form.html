@@ -33,11 +33,23 @@
                 <a id="cancel-btn" class="button is-white" type="submit">
                     Cancel
                 </a>
+                <a id="delete-btn"
+                   hx-indicator="#delete-btn"
+                   hx-swap="none"
+                   hx-confirm="Are you sure? Deleted tasks cannot be recovered."
+                   hx-headers='{"X-CSRF-Token": {{ form.csrf_token|tojson|safe  }} }'
+                   hx-delete="{{url_for('tracker.edit_task', task_id=task_id, activity_id=activity.id)}}"
+                   class="button is-danger">
+                    <span class="icon">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </span>
+                    <span>delete</span>
+                </a>
                 <button class="button is-success" id="submit-btn" type="submit">
                     <span class="icon">
                         <i class="fa-solid fa-floppy-disk"></i>
                     </span>
-                    <span>Submit</span>
+                    <span>submit</span>
                 </button>
             </div>
         </footer>
